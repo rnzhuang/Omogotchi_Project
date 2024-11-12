@@ -6,7 +6,6 @@
 #include "Stepper.h"
 #include "Bitmaps.h"
 
-
 int buttonPin1 = 24;
 int channelDisplay = 0;
 bool lastButtonState = LOW;
@@ -59,7 +58,6 @@ void switchChannelForward(int b) {
   if (channelDisplay > 1) {
     channelDisplay = 0;
   }
-  Serial.println(channelDisplay);
 }
 
 

@@ -4,7 +4,7 @@
 #include <Adafruit_SH110X.h>
 #include "BetterButton.h"
 #include "Stepper.h"
-#include "bitmaps.h"
+#include "Bitmaps.h"
 
 
 int buttonPin1 = 24;

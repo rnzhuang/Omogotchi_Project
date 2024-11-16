@@ -6,12 +6,15 @@
 #include "Stepper.h"
 #include "Bitmaps.h"
 
-int buttonPin1 = 24;
+int buttonPinR = 24;
+int buttonPinL = 25;
+int buttonPinM = 26
 int channelDisplay = 0;
 bool lastButtonState = LOW;
 bool buttonState = LOW;
 
-BetterButton button1(buttonPin1, 1);
+BetterButton buttonR(buttonPinR, 1);
+BetterButton buttonL(buttonPinl, 2);
 Stepper stepper1(4, 10);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
@@ -23,13 +26,14 @@ Adafruit_SH1107 display = Adafruit_SH1107(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OL
 #define LOGO_WIDTH 106
 
 void setup() {
-  pinMode(buttonPin1, INPUT);
+  pinMode(buttonPinR, INPUT);
   Serial.begin(9600);
 
   delay(250);
   display.begin(0x3D, true);
 
-  button1.pressHandler(switchChannelForward);
+  buttonR.pressHandler(switchChannelForward);
+  buttonL.pressHandler(switchChannelBackward);
 }
 
 void checkChannelPics() {
@@ -57,6 +61,14 @@ void switchChannelForward(int b) {
   channelDisplay = channelDisplay + 1;
   if (channelDisplay > 1) {
     channelDisplay = 0;
+  }
+}
+
+void switchChannelBackward(int b) {
+  display.clearDisplay();
+  channelDisplay = channelDisplay - 1;
+  if (channelDisplay < 0) {
+    channelDisplay = 5;
   }
 }
 

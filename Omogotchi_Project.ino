@@ -15,8 +15,8 @@ int gameStage = 0;
 bool lastButtonState = LOW;
 bool buttonState = LOW;
 
-BetterButton buttonR(buttonPinR, 1);
-BetterButton buttonL(buttonPinL, 2);
+BetterButton buttonFlipR(buttonPinR, 1);
+BetterButton buttonFlipL(buttonPinL, 2);
 BetterButton buttonStart(buttonPinM, 3);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
@@ -31,8 +31,8 @@ void setup() {
   delay(250);
   display.begin(0x3D, true);
 
-  buttonR.pressHandler(switchChannelForward);
-  buttonL.pressHandler(switchChannelBackward);
+  buttonFlipR.pressHandler(switchChannelForward);
+  buttonFlipL.pressHandler(switchChannelBackward);
   buttonStart.pressHandler(switchChannelStage);
 }
 
@@ -85,8 +85,8 @@ void displayStartScreen() {
 }
 
 void characterSelection() {
-  buttonR.process();
-  buttonL.process();
+  buttonFlipR.process();
+  buttonFlipL.process();
 }
 
 void switchChannelStage() {

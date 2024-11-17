@@ -11,12 +11,13 @@ int buttonPinL = 25;
 int buttonPinM = 26;
 int channelDisplay = 0;
 int framecount = 0;
+int gameStage = 0;
 bool lastButtonState = LOW;
 bool buttonState = LOW;
 
 BetterButton buttonR(buttonPinR, 1);
 BetterButton buttonL(buttonPinL, 2);
-Stepper stepper1(4, 10);
+BetterButton buttonStart(buttonPinM, 3);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
 #define SCREEN_HEIGHT 128  // OLED display height, in pixels
@@ -32,28 +33,28 @@ void setup() {
 
   buttonR.pressHandler(switchChannelForward);
   buttonL.pressHandler(switchChannelBackward);
+  buttonStart.pressHandler(switchChannelStage);
 }
 
 void checkChannelPics() {
   if (channelDisplay == 0) {
     display.clearDisplay();
-    if (++framecount > 2) framecount = 0; 
-    display.drawBitmap(0,0, omori[framecount], 128, 128, 1);
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, omori[framecount], 128, 128, 1);
     display.display();
     delay(150);
     delay(5);
   } else if (channelDisplay == 1) {
     display.clearDisplay();
-    if (++framecount > 2) framecount = 0; 
-    display.drawBitmap(0,0, aubrey[framecount], 128, 128, 1);
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, aubrey[framecount], 128, 128, 1);
     display.display();
     delay(150);
     delay(5);
-  }
-  else if (channelDisplay == 2) {
+  } else if (channelDisplay == 2) {
     display.clearDisplay();
-    if (++framecount > 2) framecount = 0; 
-    display.drawBitmap(0,0, basil[framecount], 128, 128, 1);
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, basil[framecount], 128, 128, 1);
     display.display();
     delay(150);
     delay(5);
@@ -76,14 +77,30 @@ void switchChannelBackward() {
   }
 }
 
-void characterSelection(){
-  switchChannelForward();
-  switchChannelBackward();
+void displayStartScreen() {
+  display.clearDisplay();
+  display.fillRect(0,0,128,128,SH110X_WHITE);
+  display.display();
+  buttonStart.process();
+}
+
+void characterSelection() {
+  buttonR.process();
+  buttonL.process();
+}
+
+void switchChannelStage() {
+  gameStage = 1;
 }
 
 
 void loop() {
-  buttonR.process();
-  buttonL.process();
-  checkChannelPics();
+  if (gameStage == 0) {
+    displayStartScreen();
+  }
+
+  else if (gameStage == 1) {
+    characterSelection();
+    checkChannelPics();
+  }
 }

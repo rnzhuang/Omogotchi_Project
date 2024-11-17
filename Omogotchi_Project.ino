@@ -8,13 +8,14 @@
 
 int buttonPinR = 24;
 int buttonPinL = 25;
-int buttonPinM = 26
+int buttonPinM = 26;
 int channelDisplay = 0;
+int framecount = 0;
 bool lastButtonState = LOW;
 bool buttonState = LOW;
 
 BetterButton buttonR(buttonPinR, 1);
-BetterButton buttonL(buttonPinl, 2);
+BetterButton buttonL(buttonPinL, 2);
 Stepper stepper1(4, 10);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
@@ -39,11 +40,10 @@ void setup() {
 void checkChannelPics() {
   if (channelDisplay == 0) {
     display.clearDisplay();
-    display.drawBitmap(
-      (display.width() - LOGO_WIDTH) / 2,
-      (display.height() - LOGO_HEIGHT) / 2,
-      omori, LOGO_WIDTH, LOGO_HEIGHT, 1);
+    if (++framecount > 2) framecount = 0; 
+    display.drawBitmap(0,0, omori[framecount], 128, 128, 1);
     display.display();
+    delay(150);
     delay(5);
   } else if (channelDisplay == 1) {
     display.clearDisplay();
@@ -56,15 +56,15 @@ void checkChannelPics() {
   }
 }
 
-void switchChannelForward(int b) {
+void switchChannelForward() {
   display.clearDisplay();
   channelDisplay = channelDisplay + 1;
-  if (channelDisplay > 1) {
+  if (channelDisplay > 5) {
     channelDisplay = 0;
   }
 }
 
-void switchChannelBackward(int b) {
+void switchChannelBackward() {
   display.clearDisplay();
   channelDisplay = channelDisplay - 1;
   if (channelDisplay < 0) {
@@ -72,8 +72,14 @@ void switchChannelBackward(int b) {
   }
 }
 
+void characterSelection(){
+  switchChannelForward();
+  switchChannelBackward();
+}
+
 
 void loop() {
-  button1.process();
+  buttonR.process();
+  buttonL.process();
   checkChannelPics();
 }

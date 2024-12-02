@@ -18,6 +18,8 @@ bool buttonState = LOW;
 BetterButton buttonFlipR(buttonPinR, 1);
 BetterButton buttonFlipL(buttonPinL, 2);
 BetterButton buttonStart(buttonPinM, 3);
+BetterButton buttonConfirm(buttonPinM, 4);
+BetterButton buttonPlay(buttonPinL, 5);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
 #define SCREEN_HEIGHT 128  // OLED display height, in pixels
@@ -33,7 +35,19 @@ void setup() {
 
   buttonFlipR.pressHandler(switchChannelForward);
   buttonFlipL.pressHandler(switchChannelBackward);
-  buttonStart.pressHandler(switchChannelStage);
+  buttonStart.pressHandler(switchChannelStage1);
+  buttonConfirm.pressHandler(switchChannelStage2);
+  buttonPlay.pressHandler(switchChannelStage3);
+}
+
+void displayStartScreen() {
+  display.clearDisplay();
+  if (++framecount > 2) framecount = 0;
+  display.drawBitmap(0, 0, start[framecount], 128, 128, 1);
+  display.display();
+  delay(150);
+  delay(5);
+  buttonStart.process();
 }
 
 void checkChannelPics() {
@@ -77,20 +91,48 @@ void switchChannelBackward() {
   }
 }
 
-void displayStartScreen() {
-  display.clearDisplay();
-  display.fillRect(0,0,128,128,SH110X_WHITE);
-  display.display();
-  buttonStart.process();
-}
-
 void characterSelection() {
   buttonFlipR.process();
   buttonFlipL.process();
+  buttonConfirm.process();
 }
 
-void switchChannelStage() {
+void omoriPage() {
+  display.clearDisplay();
+  if (++framecount > 2) framecount = 0;
+  display.drawBitmap(0, 0, omoPage[framecount], 128, 128, 1);
+  display.display();
+  delay(150);
+  delay(5);
+
+  buttonPlay.process();
+}
+
+void playViolin() {
+  display.clearDisplay();
+  for (int i = 0; i < 8; i++) {
+    display.clearDisplay();
+    display.drawBitmap(0, 0, violin[i], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+  gameStage = 2;
+}
+
+void switchChannelStage1() {
   gameStage = 1;
+  delay(200);
+}
+
+void switchChannelStage2() {
+  if (channelDisplay == 0) {
+    gameStage = 2;
+  }
+}
+
+void switchChannelStage3() {
+  gameStage = 3;
 }
 
 
@@ -102,5 +144,13 @@ void loop() {
   else if (gameStage == 1) {
     characterSelection();
     checkChannelPics();
+  }
+
+  else if (gameStage == 2) {
+    omoriPage();
+  }
+
+  else if (gameStage == 3) {
+    playViolin();
   }
 }

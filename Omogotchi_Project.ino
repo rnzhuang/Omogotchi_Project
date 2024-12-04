@@ -12,14 +12,17 @@ int buttonPinM = 26;
 int channelDisplay = 0;
 int framecount = 0;
 int gameStage = 0;
+int omoCredit = 0;
 bool lastButtonState = LOW;
 bool buttonState = LOW;
+unsigned long pressTime = 0;
 
 BetterButton buttonFlipR(buttonPinR, 1);
 BetterButton buttonFlipL(buttonPinL, 2);
 BetterButton buttonStart(buttonPinM, 3);
 BetterButton buttonConfirm(buttonPinM, 4);
 BetterButton buttonPlay(buttonPinL, 5);
+BetterButton buttonHug(buttonPinR, 6);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
 #define SCREEN_HEIGHT 128  // OLED display height, in pixels
@@ -38,6 +41,7 @@ void setup() {
   buttonStart.pressHandler(switchChannelStage1);
   buttonConfirm.pressHandler(switchChannelStage2);
   buttonPlay.pressHandler(switchChannelStage3);
+  buttonHug.pressHandler(switchChannelStage4);
 }
 
 void displayStartScreen() {
@@ -76,6 +80,7 @@ void checkChannelPics() {
 }
 
 void switchChannelForward() {
+  pressTime = millis();
   display.clearDisplay();
   channelDisplay = channelDisplay + 1;
   if (channelDisplay > 2) {
@@ -84,6 +89,7 @@ void switchChannelForward() {
 }
 
 void switchChannelBackward() {
+  pressTime = millis();
   display.clearDisplay();
   channelDisplay = channelDisplay - 1;
   if (channelDisplay < 0) {
@@ -98,18 +104,36 @@ void characterSelection() {
 }
 
 void omoriPage() {
-  display.clearDisplay();
-  if (++framecount > 2) framecount = 0;
-  display.drawBitmap(0, 0, omoPage[framecount], 128, 128, 1);
-  display.display();
-  delay(150);
-  delay(5);
+
+  if (omoCredit < 3) {
+    display.clearDisplay();
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, omoPage_1[framecount], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+
+  if (omoCredit > 2) {
+    display.clearDisplay();
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, omoPage_2[framecount], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+
+  if (millis() - pressTime > 10000){
+    omoCredit = 0;
+  }
 
   buttonPlay.process();
+  buttonHug.process();
 }
 
 void playViolin() {
   display.clearDisplay();
+  omoCredit = omoCredit + 1;
   for (int i = 0; i < 8; i++) {
     display.clearDisplay();
     display.drawBitmap(0, 0, violin[i], 128, 128, 1);
@@ -120,21 +144,42 @@ void playViolin() {
   gameStage = 2;
 }
 
+void playHug() {
+  display.clearDisplay();
+  omoCredit = omoCredit + 10;
+  for (int i = 0; i < 15; i++) {
+    display.clearDisplay();
+    display.drawBitmap(0, 0, hug[i], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+
+  gameStage = 2;
+} 
+
 void switchChannelStage1() {
+  pressTime = millis();
   gameStage = 1;
   delay(200);
 }
 
 void switchChannelStage2() {
+  pressTime = millis();
   if (channelDisplay == 0) {
     gameStage = 2;
   }
 }
 
 void switchChannelStage3() {
+  pressTime = millis();
   gameStage = 3;
 }
 
+void switchChannelStage4(){
+  pressTime = millis();
+  gameStage = 4;
+}
 
 void loop() {
   if (gameStage == 0) {
@@ -152,5 +197,9 @@ void loop() {
 
   else if (gameStage == 3) {
     playViolin();
+  }
+
+  else if (gameStage == 4){
+    playHug();
   }
 }

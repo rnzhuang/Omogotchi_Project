@@ -23,6 +23,7 @@ BetterButton buttonStart(buttonPinM, 3);
 BetterButton buttonConfirm(buttonPinM, 4);
 BetterButton buttonPlay(buttonPinL, 5);
 BetterButton buttonHug(buttonPinR, 6);
+BetterButton buttonRead(buttonPinM, 7);
 
 #define SCREEN_WIDTH 128   // OLED display width, in pixels
 #define SCREEN_HEIGHT 128  // OLED display height, in pixels
@@ -42,6 +43,7 @@ void setup() {
   buttonConfirm.pressHandler(switchChannelStage2);
   buttonPlay.pressHandler(switchChannelStage3);
   buttonHug.pressHandler(switchChannelStage4);
+  buttonRead.pressHandler(switchChannelStage5);
 }
 
 void displayStartScreen() {
@@ -114,7 +116,7 @@ void omoriPage() {
     delay(5);
   }
 
-  if (omoCredit > 2) {
+  if (omoCredit > 2 and omoCredit < 30) {
     display.clearDisplay();
     if (++framecount > 2) framecount = 0;
     display.drawBitmap(0, 0, omoPage_2[framecount], 128, 128, 1);
@@ -123,17 +125,31 @@ void omoriPage() {
     delay(5);
   }
 
-  if (millis() - pressTime > 10000){
+  if (omoCredit > 29) {
+    display.clearDisplay();
+    if (++framecount > 2) framecount = 0;
+    display.drawBitmap(0, 0, omoPage_3[framecount], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+
+  if (millis() - pressTime > 60000 and millis() - pressTime < 300000) {
+    omoCredit = 3;
+  }
+
+  if (millis() - pressTime > 300000) {
     omoCredit = 0;
   }
 
   buttonPlay.process();
   buttonHug.process();
+  buttonRead.process();
 }
 
 void playViolin() {
   display.clearDisplay();
-  omoCredit = omoCredit + 1;
+  omoCredit = omoCredit + 5;
   for (int i = 0; i < 8; i++) {
     display.clearDisplay();
     display.drawBitmap(0, 0, violin[i], 128, 128, 1);
@@ -156,7 +172,21 @@ void playHug() {
   }
 
   gameStage = 2;
-} 
+}
+
+void playRead() {
+  display.clearDisplay();
+  omoCredit = omoCredit + 5;
+  for (int i = 0; i < 13; i++) {
+    display.clearDisplay();
+    display.drawBitmap(0, 0, read[i], 128, 128, 1);
+    display.display();
+    delay(150);
+    delay(5);
+  }
+
+  gameStage = 2;
+}
 
 void switchChannelStage1() {
   pressTime = millis();
@@ -176,9 +206,14 @@ void switchChannelStage3() {
   gameStage = 3;
 }
 
-void switchChannelStage4(){
+void switchChannelStage4() {
   pressTime = millis();
   gameStage = 4;
+}
+
+void switchChannelStage5() {
+  pressTime = millis();
+  gameStage = 5;
 }
 
 void loop() {
@@ -199,7 +234,11 @@ void loop() {
     playViolin();
   }
 
-  else if (gameStage == 4){
+  else if (gameStage == 4) {
     playHug();
+  }
+
+  else if (gameStage == 5) {
+    playRead();
   }
 }
